@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { searchMovies, getMovieDetails } from './api';
 
 function App() {
@@ -9,6 +9,8 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [error, setError] = useState('');
+
+    const detailsRef = useRef(null);
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -34,6 +36,12 @@ function App() {
             setDetailsLoading(true);
             setError('');
             setSelectedId(tmdbId);
+
+            // Scroll to details on mobile
+            if (window.innerWidth < 768 && detailsRef.current) {
+                detailsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
             const data = await getMovieDetails(tmdbId);
             setSelectedMovie(data);
         } catch (err) {
@@ -46,180 +54,189 @@ function App() {
 
     return (
         <div className="app-shell">
-            <div className="glass-card p-4 p-md-5">
+            <div className="glass-panel p-4 p-md-5 h-100 d-flex flex-column">
                 {/* Header */}
-                <div className="mb-4 text-center">
-                    <h1 className="app-header fw-semibold">
-                        🎬 Movie OTT Finder
+                <div className="text-center mb-5">
+                    <h1 className="app-header display-4">
+                        Movie OTT Finder
                     </h1>
-                    <p className="app-subtitle mb-0">
-                        Search any movie and see where it&apos;s streaming (based on TMDB watch providers – region IN)
+                    <p className="app-subtitle">
+                        Discover where to watch your favorite movies in India
                     </p>
                 </div>
 
                 {/* Search */}
-                <form className="mb-4" onSubmit={handleSearch}>
-                    <div className="row g-2">
-                        <div className="col-12 col-md-9">
+                <div className="row justify-content-center mb-5">
+                    <div className="col-12 col-md-8 col-lg-6">
+                        <form onSubmit={handleSearch} className="search-container d-flex gap-2">
                             <input
                                 type="text"
                                 className="form-control search-input"
-                                placeholder="Try: Leo, Kantara, KGF, Interstellar..."
+                                placeholder="Search for a movie..."
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                             />
-                        </div>
-                        <div className="col-12 col-md-3 d-grid">
-                            <button className="btn btn-primary" type="submit" disabled={loading}>
-                                {loading ? 'Searching...' : 'Search'}
+                            <button
+                                className="btn btn-search text-white"
+                                type="submit"
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <span className="spinner-border spinner-border-sm" />
+                                ) : (
+                                    'Search'
+                                )}
                             </button>
-                        </div>
+                        </form>
+                        {error && (
+                            <div className="alert alert-danger mt-3 bg-danger bg-opacity-10 border-danger border-opacity-25 text-danger rounded-4">
+                                {error}
+                            </div>
+                        )}
                     </div>
-                </form>
+                </div>
 
-                {error && (
-                    <div className="alert alert-danger py-2" role="alert">
-                        {error}
-                    </div>
-                )}
-
-                <div className="row g-4">
-                    {/* Left: Results */}
-                    <div className="col-md-5">
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                            <span className="details-label">Results</span>
+                <div className="row g-4 flex-grow-1">
+                    {/* Left: Results List */}
+                    <div className="col-md-5 col-lg-4">
+                        <div className="d-flex justify-content-between align-items-center mb-3 px-2">
+                            <span className="text-secondary small fw-bold text-uppercase tracking-wider">
+                                Search Results
+                            </span>
                             {results.length > 0 && (
-                                <span className="badge bg-secondary">
+                                <span className="badge bg-primary bg-opacity-25 text-primary rounded-pill">
                                     {results.length}
                                 </span>
                             )}
                         </div>
 
-                        {results.length === 0 && !loading && (
-                            <p className="placeholder-text">
-                                No results yet. Start by searching for a movie above.
-                            </p>
-                        )}
+                        <div className="results-container custom-scrollbar">
+                            {results.length === 0 && !loading && (
+                                <div className="empty-state">
+                                    <div className="empty-icon">🔍</div>
+                                    <p>Search for a movie to see results here</p>
+                                </div>
+                            )}
 
-                        <div className="results-list">
-                            <ul className="list-group">
-                                {results.map((movie) => (
-                                    <li
-                                        key={movie.tmdbId}
-                                        className={
-                                            'list-group-item movie-item mb-2 ' +
-                                            (selectedId === movie.tmdbId ? 'active' : '')
-                                        }
-                                        onClick={() => handleSelectMovie(movie.tmdbId)}
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <div className="d-flex">
-                                            <div className="flex-grow-1">
-                                                <div className="d-flex justify-content-between">
-                                                    <span className="movie-title fw-semibold">
-                                                        {movie.title}
-                                                    </span>
-                                                    <small className="movie-meta">
-                                                        ⭐{' '}
-                                                        {movie.rating != null
-                                                            ? Number(movie.rating).toFixed(1)
-                                                            : 'N/A'}
-                                                    </small>
-                                                </div>
-                                                <small className="movie-meta">
-                                                    {movie.releaseDate || 'Unknown year'}
-                                                </small>
-                                                <div className="movie-overview mt-1">
-                                                    <small>
-                                                        {movie.overview
-                                                            ? movie.overview.slice(0, 80) + '...'
-                                                            : 'No description'}
-                                                    </small>
-                                                </div>
-                                            </div>
+                            {results.map((movie) => (
+                                <div
+                                    key={movie.tmdbId}
+                                    className={`movie-card ${selectedId === movie.tmdbId ? 'active' : ''}`}
+                                    onClick={() => handleSelectMovie(movie.tmdbId)}
+                                >
+                                    <img
+                                        src={movie.posterUrl || 'https://via.placeholder.com/70x105?text=No+Img'}
+                                        alt={movie.title}
+                                        className="movie-poster-thumb"
+                                        onError={(e) => e.target.src = 'https://via.placeholder.com/70x105?text=No+Img'}
+                                    />
+                                    <div className="movie-info flex-grow-1">
+                                        <h5>{movie.title}</h5>
+                                        <div className="movie-meta">
+                                            <span>{movie.releaseDate?.split('-')[0] || 'N/A'}</span>
+                                            {movie.rating > 0 && (
+                                                <>
+                                                    <span>•</span>
+                                                    <span className="text-warning">★ {Number(movie.rating).toFixed(1)}</span>
+                                                </>
+                                            )}
                                         </div>
-                                    </li>
-                                ))}
-                            </ul>
+                                        <small className="text-muted d-block mt-1 text-truncate" style={{ maxWidth: '200px' }}>
+                                            {movie.overview || 'No overview available'}
+                                        </small>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Right: Details */}
-                    <div className="col-md-7">
-                        <div className="details-card p-3 p-md-4 h-100">
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                <span className="details-label">Details</span>
-                                {detailsLoading && (
-                                    <span className="spinner-border spinner-border-sm text-light" />
-                                )}
-                            </div>
-
-                            {!detailsLoading && !selectedMovie && (
-                                <p className="placeholder-text mb-0">
-                                    Select a movie from the left to see its details &amp; OTT platforms.
-                                </p>
-                            )}
-
-                            {!detailsLoading && selectedMovie && (
-                                <>
-                                    <div className="row g-3">
-                                        {selectedMovie.posterUrl && (
-                                            <div className="col-4 col-md-4">
-                                                <img
-                                                    src={selectedMovie.posterUrl}
-                                                    alt={selectedMovie.title}
-                                                    className="img-fluid rounded-3"
-                                                    style={{ objectFit: 'cover', width: '100%' }}
-                                                />
+                    {/* Right: Details View */}
+                    <div className="col-md-7 col-lg-8" ref={detailsRef}>
+                        <div className="details-view ps-md-4">
+                            {detailsLoading ? (
+                                <div className="h-100 d-flex align-items-center justify-content-center min-vh-50">
+                                    <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }} />
+                                </div>
+                            ) : !selectedMovie ? (
+                                <div className="empty-state h-100">
+                                    <div className="empty-icon">🎬</div>
+                                    <h3>Select a Movie</h3>
+                                    <p>Click on a movie from the list to view details and streaming options</p>
+                                </div>
+                            ) : (
+                                <div className="animate-fade-in">
+                                    {/* Hero Section */}
+                                    <div className="details-hero">
+                                        <img
+                                            src={selectedMovie.backdropUrl || selectedMovie.posterUrl}
+                                            className="hero-backdrop"
+                                            alt="Backdrop"
+                                        />
+                                        <div className="hero-content">
+                                            <img
+                                                src={selectedMovie.posterUrl}
+                                                alt={selectedMovie.title}
+                                                className="poster-large d-none d-sm-block"
+                                            />
+                                            <div>
+                                                <h2 className="movie-title-large">{selectedMovie.title}</h2>
+                                                <div className="d-flex flex-wrap gap-2 mb-3">
+                                                    {selectedMovie.genres?.map(g => (
+                                                        <span key={g} className="genre-tag">{g}</span>
+                                                    ))}
+                                                </div>
+                                                <div className="d-flex align-items-center gap-3 text-light opacity-90 fw-medium">
+                                                    <span>📅 {selectedMovie.releaseDate?.split('-')[0]}</span>
+                                                    <span>•</span>
+                                                    <span>⏱️ {selectedMovie.runtime} min</span>
+                                                    {selectedMovie.rating > 0 && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span className="text-warning">★ {Number(selectedMovie.rating).toFixed(1)}</span>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
-                                        )}
-                                        <div className={selectedMovie.posterUrl ? 'col-8 col-md-8' : 'col-12'}>
-                                            <h4 className="fw-semibold mb-1">{selectedMovie.title}</h4>
-                                            <div className="movie-meta mb-2">
-                                                {selectedMovie.releaseDate || 'Unknown date'}
-                                                {selectedMovie.runtime && ` • ${selectedMovie.runtime} min`}
-                                                {selectedMovie.rating != null && (
-                                                    <>
-                                                        {' '}• ⭐ {Number(selectedMovie.rating).toFixed(1)}
-                                                    </>
-                                                )}
-                                            </div>
-                                            <p className="mb-2" style={{ fontSize: '0.95rem', color: '#d1d5db' }}>
-                                                {selectedMovie.overview || 'No description available.'}
-                                            </p>
-                                            <p className="mb-1">
-                                                <span className="details-label me-1">Genres</span>
-                                                <span className="details-value">
-                                                    {selectedMovie.genres && selectedMovie.genres.length > 0
-                                                        ? selectedMovie.genres.join(', ')
-                                                        : 'N/A'}
-                                                </span>
-                                            </p>
                                         </div>
                                     </div>
 
-                                    <hr className="my-3" />
+                                    {/* Overview */}
+                                    <div className="mb-5 px-2">
+                                        <h5 className="text-white mb-3 fw-bold">Overview</h5>
+                                        <p className="text-secondary leading-relaxed" style={{ fontSize: '1.05rem', lineHeight: '1.7' }}>
+                                            {selectedMovie.overview}
+                                        </p>
+                                    </div>
 
-                                    <div>
-                                        <div className="details-label mb-2">OTT Platforms (Region: IN)</div>
+                                    {/* OTT Section */}
+                                    <div className="p-4 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10">
+                                        <h5 className="text-white mb-4 d-flex align-items-center gap-2 fw-bold">
+                                            <span>📺</span> Streaming on (India)
+                                        </h5>
+
                                         {selectedMovie.providers && selectedMovie.providers.length > 0 ? (
-                                            <div className="d-flex flex-wrap gap-2">
+                                            <div className="ott-grid">
                                                 {selectedMovie.providers.map((p, idx) => (
-                                                    <span key={idx} className="badge badge-ott">
-                                                        {p.providerName} • {p.type}
-                                                    </span>
+                                                    <div key={idx} className="ott-badge">
+                                                        <span className="provider-name">{p.providerName}</span>
+                                                        <span className="provider-type">{p.type}</span>
+                                                    </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <p className="placeholder-text mb-0">
-                                                No OTT provider information available for this movie in your region.
-                                            </p>
+                                            <div className="text-center py-5 text-secondary">
+                                                <p className="mb-0 fs-5">No streaming information available for this region.</p>
+                                            </div>
                                         )}
                                     </div>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>
+                </div>
+
+                <div className="text-end mt-4 pt-3 border-top border-white border-opacity-10">
+                    <small className="text-secondary opacity-75 font-monospace">Developed by Manoj O</small>
                 </div>
             </div>
         </div>
