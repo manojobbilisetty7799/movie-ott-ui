@@ -9,9 +9,11 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showMobileDetails, setShowMobileDetails] = useState(false);
 
     const detailsRef = useRef(null);
 
+    // Reset mobile view when searching
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!query.trim()) return;
@@ -21,6 +23,7 @@ function App() {
             setError('');
             setSelectedMovie(null);
             setSelectedId(null);
+            setShowMobileDetails(false); // Go back to list on new search
             const data = await searchMovies(query.trim());
             setResults(data);
         } catch (err) {
@@ -36,14 +39,15 @@ function App() {
             setDetailsLoading(true);
             setError('');
             setSelectedId(tmdbId);
-
-            // Scroll to details on mobile
-            if (window.innerWidth < 768 && detailsRef.current) {
-                detailsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            setShowMobileDetails(true); // Show details view on mobile
 
             const data = await getMovieDetails(tmdbId);
             setSelectedMovie(data);
+
+            // Scroll to top of details when switching
+            if (detailsRef.current) {
+                detailsRef.current.scrollTop = 0;
+            }
         } catch (err) {
             console.error(err);
             setError('Failed to fetch movie details. Please try again.');
@@ -54,9 +58,9 @@ function App() {
 
     return (
         <div className="app-shell">
-            <div className="glass-panel p-4 p-md-5 h-100 d-flex flex-column">
+            <div className="glass-panel p-3 p-md-5 h-100 d-flex flex-column">
                 {/* Header */}
-                <div className="text-center mb-5">
+                <div className={`text-center mb-4 mb-md-5 ${showMobileDetails ? 'd-none d-md-block' : ''}`}>
                     <h1 className="app-header display-4">
                         Movie OTT Finder
                     </h1>
@@ -66,7 +70,7 @@ function App() {
                 </div>
 
                 {/* Search */}
-                <div className="row justify-content-center mb-5">
+                <div className={`row justify-content-center mb-4 mb-md-5 ${showMobileDetails ? 'd-none d-md-block' : ''}`}>
                     <div className="col-12 col-md-8 col-lg-6">
                         <form onSubmit={handleSearch} className="search-container d-flex gap-2">
                             <input
@@ -96,9 +100,9 @@ function App() {
                     </div>
                 </div>
 
-                <div className="row g-4 flex-grow-1">
+                <div className="row g-4 flex-grow-1 overflow-hidden">
                     {/* Left: Results List */}
-                    <div className="col-md-5 col-lg-4">
+                    <div className={`col-md-5 col-lg-4 h-100 d-flex flex-column ${showMobileDetails ? 'd-none d-md-flex' : ''}`}>
                         <div className="d-flex justify-content-between align-items-center mb-3 px-2">
                             <span className="text-secondary small fw-bold text-uppercase tracking-wider">
                                 Search Results
@@ -110,7 +114,7 @@ function App() {
                             )}
                         </div>
 
-                        <div className="results-container custom-scrollbar">
+                        <div className="results-container custom-scrollbar flex-grow-1">
                             {results.length === 0 && !loading && (
                                 <div className="empty-state">
                                     <div className="empty-icon">🔍</div>
@@ -151,8 +155,16 @@ function App() {
                     </div>
 
                     {/* Right: Details View */}
-                    <div className="col-md-7 col-lg-8" ref={detailsRef}>
-                        <div className="details-view ps-md-4">
+                    <div className={`col-md-7 col-lg-8 h-100 ${!showMobileDetails ? 'd-none d-md-block' : ''}`} ref={detailsRef}>
+                        <div className="details-view ps-md-4 h-100 overflow-auto custom-scrollbar">
+                            {/* Mobile Back Button */}
+                            <button
+                                className="btn btn-link text-white text-decoration-none mb-3 d-md-none p-0 d-flex align-items-center gap-2"
+                                onClick={() => setShowMobileDetails(false)}
+                            >
+                                <span className="fs-4">←</span> Back to Results
+                            </button>
+
                             {detailsLoading ? (
                                 <div className="h-100 d-flex align-items-center justify-content-center min-vh-50">
                                     <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }} />
@@ -164,7 +176,7 @@ function App() {
                                     <p>Click on a movie from the list to view details and streaming options</p>
                                 </div>
                             ) : (
-                                <div className="animate-fade-in">
+                                <div className="animate-fade-in pb-5">
                                     {/* Hero Section */}
                                     <div className="details-hero">
                                         <img
