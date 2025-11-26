@@ -159,7 +159,7 @@ function App() {
                         <div className="details-view ps-md-4 h-100 overflow-auto custom-scrollbar">
                             {/* Mobile Back Button */}
                             <button
-                                className="btn btn-link text-white text-decoration-none mb-3 d-md-none p-0 d-flex align-items-center gap-2"
+                                className="btn btn-back-mobile text-white d-md-none d-flex align-items-center gap-2"
                                 onClick={() => setShowMobileDetails(false)}
                             >
                                 <span className="fs-4">←</span> Back to Results
@@ -221,7 +221,7 @@ function App() {
                                     </div>
 
                                     {/* OTT Section */}
-                                    <div className="p-4 rounded-4 bg-white bg-opacity-5 border border-white border-opacity-10">
+                                    <div className="ott-section">
                                         <h5 className="text-white mb-4 d-flex align-items-center gap-2 fw-bold">
                                             <span>📺</span> Streaming on (India)
                                         </h5>
@@ -229,7 +229,11 @@ function App() {
                                         {selectedMovie.providers && selectedMovie.providers.length > 0 ? (
                                             <div className="ott-grid">
                                                 {selectedMovie.providers.map((p, idx) => (
-                                                    <div key={idx} className="ott-badge">
+                                                    <div
+                                                        key={idx}
+                                                        className="ott-badge"
+                                                        style={{ animationDelay: `${idx * 0.1}s` }}
+                                                    >
                                                         <span className="provider-name">{p.providerName}</span>
                                                         <span className="provider-type">{p.type}</span>
                                                     </div>
