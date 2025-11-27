@@ -56,9 +56,29 @@ function App() {
         }
     };
 
+    const handleHome = () => {
+        setQuery('');
+        setResults([]);
+        setSelectedMovie(null);
+        setSelectedId(null);
+        setError('');
+        setShowMobileDetails(false);
+    };
+
     return (
         <div className="app-shell">
             <div className="glass-panel p-3 p-md-5 h-100 d-flex flex-column">
+                {/* Home Button */}
+                {(results.length > 0 || selectedMovie || query) && (
+                    <button
+                        className="btn-home"
+                        onClick={handleHome}
+                        title="Go to Home"
+                    >
+                        <span>🏠</span> Home
+                    </button>
+                )}
+
                 {/* Header */}
                 <div className={`text-center mb-4 mb-md-5 ${showMobileDetails ? 'd-none d-md-block' : ''}`}>
                     <h1 className="app-header display-4">

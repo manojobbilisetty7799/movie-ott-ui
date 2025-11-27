@@ -158,6 +158,39 @@ body {
     opacity: 1;
 }
 
+.btn-home {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-home:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-home:active {
+    transform: translateY(0);
+}
+
 /* Results List */
 .results-container {
     height: 100%;
@@ -200,6 +233,12 @@ body {
     object-fit: cover;
     background: #1e293b;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    flex-shrink: 0;
+}
+
+.movie-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .movie-info h5 {
@@ -434,6 +473,27 @@ body {
 }
 
 /* Responsive Adjustments */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .app-shell {
+        padding: 1.25rem;
+    }
+
+    .glass-panel {
+        padding: 2rem !important;
+    }
+
+    .movie-title-large {
+        font-size: 2.5rem;
+    }
+
+    .ott-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+}
+
+/* Mobile (up to 768px) */
 @media (max-width: 768px) {
     .app-shell {
         padding: 0.75rem;
@@ -441,56 +501,153 @@ body {
     }
 
     .glass-panel {
-        padding: 1.25rem !important;
-        border-radius: 24px;
+        padding: 1rem !important;
+        border-radius: 20px;
     }
 
     .app-header {
-        font-size: 2.2rem;
-    }
-
-    .hero-backdrop {
-        height: 220px;
-    }
-
-    .hero-content {
-        padding: 1.5rem;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .poster-large {
-        width: 110px;
-        transform: translateY(0);
-        margin-top: -60px;
-        z-index: 2;
-        border-width: 2px;
-    }
-
-    .movie-title-large {
         font-size: 2rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .app-subtitle {
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    .btn-home {
+        top: 0.75rem;
+        right: 0.75rem;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.75rem;
+        gap: 0.3rem;
+        border-radius: 10px;
+    }
+
+    /* Search */
+    .search-input {
+        padding: 1rem 1.25rem !important;
+        font-size: 1rem !important;
+        border-radius: 20px !important;
     }
 
     .search-container {
         flex-direction: column;
+        gap: 0.75rem;
     }
 
     .btn-search {
         width: 100%;
         padding: 1rem;
+        font-size: 1rem;
+        border-radius: 20px;
     }
 
+    /* Movie Cards */
+    .movie-card {
+        padding: 0.85rem;
+        gap: 1rem;
+        border-radius: 16px;
+        margin-bottom: 0.85rem;
+    }
+
+    .movie-poster-thumb {
+        width: 60px;
+        height: 90px;
+        border-radius: 10px;
+    }
+
+    .movie-info h5 {
+        font-size: 1rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .movie-meta {
+        font-size: 0.8rem;
+        gap: 0.5rem;
+    }
+
+    /* Details View */
+    .hero-backdrop {
+        height: 200px;
+    }
+
+    .hero-content {
+        padding: 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+    }
+
+    .poster-large {
+        width: 100px;
+        transform: translateY(0);
+        margin-top: -50px;
+        z-index: 2;
+        border-width: 2px;
+        border-radius: 14px;
+    }
+
+    .movie-title-large {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .genre-tag {
+        padding: 0.3rem 0.9rem;
+        font-size: 0.75rem;
+        border-radius: 50px;
+    }
+
+    /* OTT Section */
+    .ott-section {
+        padding: 1.5rem;
+        border-radius: 20px;
+    }
+
+    .ott-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 0.65rem;
+        margin-top: 1.25rem;
+    }
+
+    .ott-badge {
+        padding: 0.65rem;
+        border-radius: 14px;
+    }
+
+    .provider-name {
+        font-size: 0.8rem;
+    }
+
+    .provider-type {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+
+    /* Empty States */
+    .empty-state {
+        min-height: 300px;
+        border-radius: 24px;
+    }
+
+    .empty-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Back Button */
     .btn-back-mobile {
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 0.8rem 1rem;
+        border-radius: 14px;
+        padding: 0.75rem 1rem;
         width: 100%;
         justify-content: center;
-        margin-bottom: 1.5rem !important;
+        margin-bottom: 1.25rem !important;
         transition: all 0.2s;
         font-weight: 600;
+        font-size: 0.95rem;
         letter-spacing: 0.02em;
         backdrop-filter: blur(10px);
     }
@@ -498,5 +655,125 @@ body {
     .btn-back-mobile:active {
         background: rgba(255, 255, 255, 0.15);
         transform: scale(0.98);
+    }
+
+    /* Results container */
+    .results-container {
+        padding-right: 0.5rem;
+    }
+}
+
+/* Small Mobile (up to 480px) */
+@media (max-width: 480px) {
+    .app-shell {
+        padding: 0.5rem;
+    }
+
+    .glass-panel {
+        padding: 0.85rem !important;
+        border-radius: 18px;
+    }
+
+    .app-header {
+        font-size: 1.75rem;
+    }
+
+    .app-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .btn-home {
+        top: 0.6rem;
+        right: 0.6rem;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.7rem;
+        gap: 0.25rem;
+    }
+
+    .search-input {
+        padding: 0.9rem 1rem !important;
+        font-size: 0.95rem !important;
+    }
+
+    .btn-search {
+        padding: 0.9rem;
+        font-size: 0.95rem;
+    }
+
+    .movie-card {
+        padding: 0.75rem;
+        gap: 0.85rem;
+    }
+
+    .movie-poster-thumb {
+        width: 55px;
+        height: 82px;
+    }
+
+    .movie-info h5 {
+        font-size: 0.95rem;
+    }
+
+    .movie-meta {
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-backdrop {
+        height: 180px;
+    }
+
+    .hero-content {
+        padding: 1rem;
+    }
+
+    .poster-large {
+        width: 90px;
+        margin-top: -45px;
+    }
+
+    .movie-title-large {
+        font-size: 1.5rem;
+    }
+
+    .ott-section {
+        padding: 1.25rem;
+    }
+
+    .ott-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .ott-badge {
+        padding: 0.5rem;
+    }
+
+    .provider-name {
+        font-size: 0.75rem;
+    }
+
+    .provider-type {
+        font-size: 0.55rem;
+    }
+}
+
+/* Landscape orientation for mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    .app-shell {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .hero-backdrop {
+        height: 150px;
+    }
+
+    .empty-state {
+        min-height: 200px;
+    }
+
+    .empty-icon {
+        font-size: 2.5rem;
     }
 }
